@@ -1,40 +1,80 @@
-.game {
-  background-color: #f0f0f0;
-  color: #333;
-  font-family: 'Arial', sans-serif;
-  text-align: center;
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
 }
 
-.game-title {
-  font-size: 2.5em;
-  font-weight: bold;
-  margin: 20px 0;
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #333;
 }
 
-.start-button {
-  padding: 10px 20px;
-  font-size: 1.2em;
-  color: white;
-  background-color: #007bff;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
+the in body{
+    background-color: rgba(20, 20, 40, 0.95);
+    color: white;
+    text-align: center;
+    border-radius: 15px;
+    padding: 30px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    max-width: 900px;
+    width: 100%;
 }
 
-.start-button:hover {
-  background-color: #0056b3;
+h1 {
+    font-size: 2.5em;
+    font-weight: bold;
+    margin: 20px 0;
+    color: #00ff88;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+#gameCanvas {
+    display: block;
+    background: linear-gradient(to bottom, #1a1a2e, #16213e);
+    border-radius: 10px;
+    margin: 20px auto;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+.start-button, #startButton {
+    padding: 12px 30px;
+    font-size: 1.1em;
+    color: white;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.start-button:hover, #startButton:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 7px 20px rgba(102, 126, 234, 0.4);
+}
+
+.start-button:active, #startButton:active {
+    transform: translateY(-1px);
 }
 
 .animation {
-  animation: bounce 1s infinite;
+    animation: bounce 1s infinite;
 }
 
 @keyframes bounce {
-  0%, 100% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(-20px);
-  }
+    0%, 100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-20px);
+    }
 }
