@@ -1,98 +1,113 @@
-// Asteroid Defender Game Implementation
-
-// Game setup
-const canvas = document.getElementById('gameCanvas');
-const ctx = canvas.getContext('2d');
-
-canvas.width = window.innerWidth;
-canvas.height = window.innerHeight;
+// Asteroid Defender Game
 
 // Variables
-let player;
-let asteroids = [];
-let score = 0;
-let gameOver = false;
+let canvas, context;
+const asteroids = [];
+const player = {
+    x: 400,
+    y: 550,
+    width: 50,
+    height: 50,
+    color: 'white',
+    score: 0,
+    level: 1,
+};
+const settings = {
+    gravity: 0.05,
+    asteroidSpawnRate: 100,
+    difficultyIncrease: 50,
+};
+let keys = {};  
 
-// Game Mechanics
-function setup() {
-    player = new Player();
-    spawnAsteroids();
+// Initialize the game
+function init() {
+    canvas = document.getElementById('gameCanvas');
+    context = canvas.getContext('2d');
+    document.addEventListener('keydown', keyDown);
+    document.addEventListener('keyup', keyUp);
     gameLoop();
 }
 
-// Class for player
-class Player {
-    constructor() {
-        this.width = 50;
-        this.height = 50;
-        this.x = canvas.width / 2;
-        this.y = canvas.height / 2;
-        this.speed = 5;
-        this.score = 0;
-        this.initControls();
-    }
-
-    initControls() {
-        window.addEventListener('keydown', (e) => {
-            switch (e.key) {
-                case 'ArrowUp': this.y -= this.speed; break;
-                case 'ArrowDown': this.y += this.speed; break;
-                case 'ArrowLeft': this.x -= this.speed; break;
-                case 'ArrowRight': this.x += this.speed; break;
-            }
-        });
-    }
-
-    draw() {
-        ctx.fillStyle = 'blue';
-        ctx.fillRect(this.x, this.y, this.width, this.height);
-    }
+function keyDown(e) {
+    keys[e.code] = true;
+}
+function keyUp(e) {
+    keys[e.code] = false;
 }
 
-// Asteroid class
-class Asteroid {
-    constructor() {
-        this.x = Math.random() * canvas.width;
-        this.y = Math.random() * canvas.height;
-        this.size = 50;
-    }
-
-    draw() {
-        ctx.fillStyle = 'gray';
-        ctx.beginPath();
-        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-        ctx.fill();
-    }
-}
-
-function spawnAsteroids() {
-    for (let i = 0; i < 10; i++) {
-        asteroids.push(new Asteroid());
-    }
-}
-
+// Game loop
 function gameLoop() {
-    if (gameOver) return;
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    player.draw();
-
-    asteroids.forEach(asteroid => {
-        asteroid.draw();
-        // Collision Detection Logic
-        if (detectCollision(player, asteroid)) {
-            gameOver = true;
-            alert('Game Over! Your score: ' + player.score);
-        }
-    });
-
+    update();
+    draw();
     requestAnimationFrame(gameLoop);
 }
 
-function detectCollision(player, asteroid) {
-    return player.x < asteroid.x + asteroid.size &&
-           player.x + player.width > asteroid.x &&
-           player.y < asteroid.y + asteroid.size &&
-           player.y + player.height > asteroid.y;
+// Update the game state
+function update() {
+    if (keys['ArrowLeft'] && player.x > 0) {
+        player.x -= 5;
+    }
+    if (keys['ArrowRight'] && player.x < canvas.width - player.width) {
+        player.x += 5;
+    }
+    spawnAsteroids();
+    checkCollisions();
 }
 
-setup();
+// Draw everything on canvas
+function draw() {
+    context.clearRect(0, 0, canvas.width, canvas.height);
+    drawPlayer();
+    drawAsteroids();
+    drawScore();
+}
+
+function drawPlayer() {
+    context.fillStyle = player.color;
+    context.fillRect(player.x, player.y, player.width, player.height);
+}
+
+// Spawn asteroids
+function spawnAsteroids() {
+    if (Math.random() < 1 / settings.asteroidSpawnRate) {
+        const size = Math.random() * (50 - 20) + 20;
+        const x = Math.random() * canvas.width;
+        const y = 0;
+        asteroids.push({ x, y, size });
+    }
+}
+
+// Draw asteroids
+function drawAsteroids() {
+    context.fillStyle = 'gray';
+    asteroids.forEach(asteroid => {
+        context.beginPath();
+        context.arc(asteroid.x, asteroid.y, asteroid.size, 0, Math.PI * 2);
+        context.fill();
+        asteroid.y += settings.gravity * asteroid.size;
+    });
+}
+
+// Check for collisions
+function checkCollisions() {
+    asteroids.forEach((asteroid, index) => {
+        if (asteroid.y + asteroid.size > player.y &&
+            asteroid.x > player.x &&
+            asteroid.x < player.x + player.width) {
+            gameOver();
+        }
+    });
+}
+
+function gameOver() {
+    alert('Game Over! Your Score: ' + player.score);
+    document.location.reload();
+}
+
+function drawScore() {
+    context.fillStyle = 'white';
+    context.font = '20px Arial';
+    context.fillText('Score: ' + player.score, 10, 20);
+}
+
+window.onload = init;
