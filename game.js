@@ -25,6 +25,7 @@ function init() {
     context = canvas.getContext('2d');
     document.addEventListener('keydown', keyDown);
     document.addEventListener('keyup', keyUp);
+    document.getElementById('startButton').addEventListener('click', startGame);
     gameLoop();
 }
 
@@ -33,6 +34,12 @@ function keyDown(e) {
 }
 function keyUp(e) {
     keys[e.code] = false;
+}
+
+function startGame() {
+    asteroids.length = 0;
+    player.score = 0;
+    player.level = 1;
 }
 
 // Game loop
@@ -51,12 +58,15 @@ function update() {
         player.x += 5;
     }
     spawnAsteroids();
+    updateAsteroids();
     checkCollisions();
 }
 
 // Draw everything on canvas
 function draw() {
     context.clearRect(0, 0, canvas.width, canvas.height);
+    context.fillStyle = 'rgba(26, 26, 46, 0.1)';
+    context.fillRect(0, 0, canvas.width, canvas.height);
     drawPlayer();
     drawAsteroids();
     drawScore();
@@ -77,6 +87,18 @@ function spawnAsteroids() {
     }
 }
 
+// Update asteroid positions
+function updateAsteroids() {
+    for (let i = asteroids.length - 1; i >= 0; i--) {
+        asteroids[i].y += settings.gravity * asteroids[i].size;
+        // Remove asteroids that fall off screen
+        if (asteroids[i].y > canvas.height + asteroids[i].size) {
+            asteroids.splice(i, 1);
+            player.score += 10;
+        }
+    }
+}
+
 // Draw asteroids
 function drawAsteroids() {
     context.fillStyle = 'gray';
@@ -84,16 +106,22 @@ function drawAsteroids() {
         context.beginPath();
         context.arc(asteroid.x, asteroid.y, asteroid.size, 0, Math.PI * 2);
         context.fill();
-        asteroid.y += settings.gravity * asteroid.size;
     });
 }
 
-// Check for collisions
+// Check for collisions - FIXED
 function checkCollisions() {
     asteroids.forEach((asteroid, index) => {
-        if (asteroid.y + asteroid.size > player.y &&
-            asteroid.x > player.x &&
-            asteroid.x < player.x + player.width) {
+        const playerCenterX = player.x + player.width / 2;
+        const playerCenterY = player.y + player.height / 2;
+        
+        const dx = asteroid.x - playerCenterX;
+        const dy = asteroid.y - playerCenterY;
+        const distance = Math.sqrt(dx * dx + dy * dy);
+        
+        const collisionDistance = asteroid.size + player.width / 2;
+        
+        if (distance < collisionDistance) {
             gameOver();
         }
     });
@@ -108,6 +136,7 @@ function drawScore() {
     context.fillStyle = 'white';
     context.font = '20px Arial';
     context.fillText('Score: ' + player.score, 10, 20);
+    context.fillText('Level: ' + player.level, 10, 50);
 }
 
 window.onload = init;
